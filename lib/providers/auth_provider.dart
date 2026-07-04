@@ -21,22 +21,28 @@ class AuthProvider extends ChangeNotifier {
   Future<void> initialize() async {
     if (_isInitialized) return;
 
-    // Cek apakah sudah ada user di database
-    final userCount = await DatabaseHelper.instance.getUserCount();
+    _error = null;
 
-    // Kalau belum ada user, buat user owner default
-    if (userCount == 0) {
-      await DatabaseHelper.instance.insertUser(
-        User(
-          name: 'Owner',
-          email: 'owner@kasirku.com',
-          password: 'kasirku123',
-          role: 'owner',
-        ),
-      );
+    try {
+      // Cek apakah sudah ada user di database
+      final userCount = await DatabaseHelper.instance.getUserCount();
+
+      // Kalau belum ada user, buat user owner default
+      if (userCount == 0) {
+        await DatabaseHelper.instance.insertUser(
+          User(
+            name: 'Owner',
+            email: 'owner@kasirku.com',
+            password: 'kasirku123',
+            role: 'owner',
+          ),
+        );
+      }
+
+      _isInitialized = true;
+    } catch (e) {
+      _error = 'Gagal inisialisasi: $e';
     }
-
-    _isInitialized = true;
     notifyListeners();
   }
 

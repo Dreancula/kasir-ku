@@ -132,42 +132,100 @@ class _AuthWrapperState extends State<AuthWrapper> {
   @override
   void initState() {
     super.initState();
+    final auth = context.read<AuthProvider>();
+    auth.addListener(_onAuthChanged);
     _initialize();
   }
 
+  @override
+  void dispose() {
+    context.read<AuthProvider>().removeListener(_onAuthChanged);
+    super.dispose();
+  }
+
+  void _onAuthChanged() {
+    final auth = context.read<AuthProvider>();
+    if (auth.error == null && auth.isInitialized && !_isInitialized) {
+      setState(() => _isInitialized = true);
+    }
+  }
+
   Future<void> _initialize() async {
-    await context.read<AuthProvider>().initialize();
-    setState(() => _isInitialized = true);
+    final auth = context.read<AuthProvider>();
+    await auth.initialize();
+    if (mounted && auth.error == null) {
+      setState(() => _isInitialized = true);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     if (!_isInitialized) {
-      return const Scaffold(
+      return Scaffold(
         backgroundColor: AppConfig.primaryColor,
         body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.storefront,
-                size: 64,
-                color: Colors.white,
-              ),
-              SizedBox(height: 16),
-              Text(
-                'KasirKu',
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-              SizedBox(height: 24),
-              CircularProgressIndicator(
-                color: Colors.white,
-              ),
-            ],
+          child: Consumer<AuthProvider>(
+            builder: (context, auth, child) {
+              if (auth.error != null) {
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 32),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(
+                        Icons.error_outline,
+                        size: 64,
+                        color: Colors.white,
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        auth.error!,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      ElevatedButton.icon(
+                        onPressed: () {
+                          context.read<AuthProvider>().initialize();
+                        },
+                        icon: const Icon(Icons.refresh),
+                        label: const Text('Coba Lagi'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white,
+                          foregroundColor: AppConfig.primaryColor,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }
+              return const Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.storefront,
+                    size: 64,
+                    color: Colors.white,
+                  ),
+                  SizedBox(height: 16),
+                  Text(
+                    'KasirKu',
+                    style: TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                  SizedBox(height: 24),
+                  CircularProgressIndicator(
+                    color: Colors.white,
+                  ),
+                ],
+              );
+            },
           ),
         ),
       );
