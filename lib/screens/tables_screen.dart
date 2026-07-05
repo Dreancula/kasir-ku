@@ -4,6 +4,7 @@ import '../database/database_helper.dart';
 import '../models/table_model.dart';
 import '../providers/cart_provider.dart';
 import '../config/app_config.dart';
+import '../widgets/animations.dart';
 
 class TablesScreen extends StatefulWidget {
   const TablesScreen({super.key});
@@ -250,7 +251,11 @@ class _TablesScreenState extends State<TablesScreen> {
                         itemCount: _tables.length,
                         itemBuilder: (context, index) {
                           final table = _tables[index];
-                          return _buildTableCard(table, cart);
+                          return FadeInUp(
+                            delayMs: index * 60,
+                            offset: 20,
+                            child: _buildTableCard(table, cart),
+                          );
                         },
                       ),
                     ),
@@ -373,26 +378,34 @@ class _TablesScreenState extends State<TablesScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.table_restaurant_outlined,
-            size: 72,
-            color: Colors.grey[300],
+          FadeInUp(
+            child: Icon(
+              Icons.table_restaurant_outlined,
+              size: 72,
+              color: Colors.grey[300],
+            ),
           ),
           const SizedBox(height: 16),
-          Text(
-            'Belum ada meja',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              color: Colors.grey[600],
+          FadeInUp(
+            delayMs: 150,
+            child: Text(
+              'Belum ada meja',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: Colors.grey[600],
+              ),
             ),
           ),
           const SizedBox(height: 8),
-          Text(
-            'Tekan tombol + untuk menambah meja',
-            style: TextStyle(
-              fontSize: 13,
-              color: Colors.grey[400],
+          FadeInUp(
+            delayMs: 300,
+            child: Text(
+              'Tekan tombol + untuk menambah meja',
+              style: TextStyle(
+                fontSize: 13,
+                color: Colors.grey[400],
+              ),
             ),
           ),
         ],

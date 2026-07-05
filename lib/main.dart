@@ -1,14 +1,22 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'screens/home_screen.dart';
 import 'screens/login_screen.dart';
 import 'config/app_config.dart';
 import 'providers/cart_provider.dart';
 import 'providers/auth_provider.dart';
+import 'widgets/animations.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+    sqfliteFfiInit();
+    databaseFactory = databaseFactoryFfiNoIsolate;
+  }
   await initializeDateFormatting('id_ID', null);
   runApp(const KasirApp());
 }
@@ -172,59 +180,45 @@ class _AuthWrapperState extends State<AuthWrapper> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(
-                        Icons.error_outline,
-                        size: 64,
-                        color: Colors.white,
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        auth.error!,
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          fontSize: 16,
+                      FadeInUp(
+                        child: const Icon(
+                          Icons.error_outline,
+                          size: 64,
                           color: Colors.white,
                         ),
                       ),
+                      const SizedBox(height: 16),
+                      FadeInUp(
+                        delayMs: 150,
+                        child: Text(
+                          auth.error!,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
                       const SizedBox(height: 24),
-                      ElevatedButton.icon(
-                        onPressed: () {
-                          context.read<AuthProvider>().initialize();
-                        },
-                        icon: const Icon(Icons.refresh),
-                        label: const Text('Coba Lagi'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white,
-                          foregroundColor: AppConfig.primaryColor,
+                      FadeInUp(
+                        delayMs: 300,
+                        child: ElevatedButton.icon(
+                          onPressed: () {
+                            context.read<AuthProvider>().initialize();
+                          },
+                          icon: const Icon(Icons.refresh),
+                          label: const Text('Coba Lagi'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            foregroundColor: AppConfig.primaryColor,
+                          ),
                         ),
                       ),
                     ],
                   ),
                 );
               }
-              return const Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.storefront,
-                    size: 64,
-                    color: Colors.white,
-                  ),
-                  SizedBox(height: 16),
-                  Text(
-                    'KasirKu',
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                  SizedBox(height: 24),
-                  CircularProgressIndicator(
-                    color: Colors.white,
-                  ),
-                ],
-              );
+              return const _AnimatedSplash();
             },
           ),
         ),
@@ -237,6 +231,144 @@ class _AuthWrapperState extends State<AuthWrapper> {
           return const HomeScreen();
         }
         return const LoginScreen();
+      },
+    );
+  }
+}
+
+class _AnimatedSplash extends StatefulWidget {
+  const _AnimatedSplash();
+
+  @override
+  State<_AnimatedSplash> createState() => _AnimatedSplashState();
+}
+
+class _AnimatedSplashState extends State<_AnimatedSplash>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _logoScale;
+  late Animation<double> _logoOpacity;
+  late Animation<double> _textSlide;
+  late Animation<double> _textOpacity;
+  late Animation<double> _indicatorOpacity;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1600),
+    );
+    _logoScale = Tween<double>(begin: 0.5, end: 1).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: const Interval(0, 0.5, curve: Curves.elasticOut),
+      ),
+    );
+    _logoOpacity = Tween<double>(begin: 0, end: 1).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: const Interval(0, 0.3, curve: Curves.easeOut),
+      ),
+    );
+    _textSlide = Tween<double>(begin: 30, end: 0).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: const Interval(0.3, 0.7, curve: Curves.easeOutCubic),
+      ),
+    );
+    _textOpacity = Tween<double>(begin: 0, end: 1).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: const Interval(0.3, 0.7, curve: Curves.easeOut),
+      ),
+    );
+    _indicatorOpacity = Tween<double>(begin: 0, end: 1).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: const Interval(0.7, 1, curve: Curves.easeOut),
+      ),
+    );
+    _controller.forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        return Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Opacity(
+              opacity: _logoOpacity.value,
+              child: Transform.scale(
+                scale: _logoScale.value,
+                child: Container(
+                  width: 80,
+                  height: 80,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(24),
+                  ),
+                  child: const Icon(
+                    Icons.storefront,
+                    size: 48,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+            Opacity(
+              opacity: _textOpacity.value,
+              child: Transform.translate(
+                offset: Offset(0, _textSlide.value),
+                child: const Text(
+                  'KasirKu',
+                  style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                    letterSpacing: 1.2,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 8),
+            Opacity(
+              opacity: _textOpacity.value,
+              child: Transform.translate(
+                offset: Offset(0, _textSlide.value),
+                child: Text(
+                  AppConfig.businessName,
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: Colors.white.withValues(alpha: 0.8),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 32),
+            Opacity(
+              opacity: _indicatorOpacity.value,
+              child: const SizedBox(
+                width: 28,
+                height: 28,
+                child: CircularProgressIndicator(
+                  color: Colors.white,
+                  strokeWidth: 2.5,
+                ),
+              ),
+            ),
+          ],
+        );
       },
     );
   }

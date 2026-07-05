@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../database/database_helper.dart';
 import '../models/user.dart';
 import '../config/app_config.dart';
+import '../widgets/animations.dart';
 
 class UsersScreen extends StatefulWidget {
   const UsersScreen({super.key});
@@ -119,7 +120,11 @@ class _UsersScreenState extends State<UsersScreen> {
                   separatorBuilder: (_, __) => const SizedBox(height: 12),
                   itemBuilder: (context, index) {
                     final user = _users[index];
-                    return _buildUserCard(user);
+                    return FadeInUp(
+                      delayMs: index * 60,
+                      offset: 20,
+                      child: _buildUserCard(user),
+                    );
                   },
                 ),
       floatingActionButton: FloatingActionButton.extended(
@@ -253,26 +258,34 @@ class _UsersScreenState extends State<UsersScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.people_outline,
-            size: 72,
-            color: Colors.grey[300],
+          FadeInUp(
+            child: Icon(
+              Icons.people_outline,
+              size: 72,
+              color: Colors.grey[300],
+            ),
           ),
           const SizedBox(height: 16),
-          Text(
-            'Belum ada user',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              color: Colors.grey[600],
+          FadeInUp(
+            delayMs: 150,
+            child: Text(
+              'Belum ada user',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: Colors.grey[600],
+              ),
             ),
           ),
           const SizedBox(height: 8),
-          Text(
-            'Tekan tombol + untuk menambah user',
-            style: TextStyle(
-              fontSize: 13,
-              color: Colors.grey[400],
+          FadeInUp(
+            delayMs: 300,
+            child: Text(
+              'Tekan tombol + untuk menambah user',
+              style: TextStyle(
+                fontSize: 13,
+                color: Colors.grey[400],
+              ),
             ),
           ),
         ],

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../database/database_helper.dart';
 import '../config/app_config.dart';
+import '../widgets/animations.dart';
 
 enum ReportPeriod { hariIni, mingguIni, bulanIni, custom }
 
@@ -220,30 +221,50 @@ class _ReportsScreenState extends State<ReportsScreen> {
                           padding: const EdgeInsets.all(16),
                           children: [
                             // Summary cards
-                            _buildSummaryCards(),
+                            FadeInUp(
+                              child: _buildSummaryCards(),
+                            ),
                             const SizedBox(height: 20),
 
                             // Sales by user
                             if ((_report!['by_user'] as List).isNotEmpty) ...[
-                              _buildSectionTitle('Penjualan per Kasir'),
+                              FadeInUp(
+                                delayMs: 150,
+                                child: _buildSectionTitle('Penjualan per Kasir'),
+                              ),
                               const SizedBox(height: 10),
-                              _buildUserSalesCard(),
+                              FadeInUp(
+                                delayMs: 200,
+                                child: _buildUserSalesCard(),
+                              ),
                               const SizedBox(height: 20),
                             ],
 
                             // Daily breakdown
                             if ((_report!['by_date'] as List).isNotEmpty) ...[
-                              _buildSectionTitle('Rincian Harian'),
+                              FadeInUp(
+                                delayMs: 300,
+                                child: _buildSectionTitle('Rincian Harian'),
+                              ),
                               const SizedBox(height: 10),
-                              _buildDailyBreakdown(),
+                              FadeInUp(
+                                delayMs: 350,
+                                child: _buildDailyBreakdown(),
+                              ),
                               const SizedBox(height: 20),
                             ],
 
                             // Top items
                             if ((_report!['top_items'] as List).isNotEmpty) ...[
-                              _buildSectionTitle('Menu Terlaris'),
+                              FadeInUp(
+                                delayMs: 450,
+                                child: _buildSectionTitle('Menu Terlaris'),
+                              ),
                               const SizedBox(height: 10),
-                              _buildTopItemsCard(),
+                              FadeInUp(
+                                delayMs: 500,
+                                child: _buildTopItemsCard(),
+                              ),
                             ],
 
                             const SizedBox(height: 20),
@@ -653,26 +674,34 @@ class _ReportsScreenState extends State<ReportsScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.analytics_outlined,
-            size: 72,
-            color: Colors.grey[300],
+          FadeInUp(
+            child: Icon(
+              Icons.analytics_outlined,
+              size: 72,
+              color: Colors.grey[300],
+            ),
           ),
           const SizedBox(height: 16),
-          Text(
-            'Tidak ada data',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              color: Colors.grey[600],
+          FadeInUp(
+            delayMs: 150,
+            child: Text(
+              'Tidak ada data',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: Colors.grey[600],
+              ),
             ),
           ),
           const SizedBox(height: 8),
-          Text(
-            'Transaksi pada periode ini belum ada',
-            style: TextStyle(
-              fontSize: 13,
-              color: Colors.grey[400],
+          FadeInUp(
+            delayMs: 300,
+            child: Text(
+              'Transaksi pada periode ini belum ada',
+              style: TextStyle(
+                fontSize: 13,
+                color: Colors.grey[400],
+              ),
             ),
           ),
         ],

@@ -31,6 +31,7 @@ dependencies:
   flutter:
     sdk: flutter
   sqflite: ^2.3.0 # database lokal
+  sqflite_common_ffi: ^2.3.0 # database lokal untuk desktop
   path: ^1.8.3 # bantu cari lokasi file database
   intl: ^0.19.0 # format harga (Rp 15.000)
   provider: ^6.1.1
@@ -62,6 +63,13 @@ flutter_launcher_icons:
   android: true
   ios: true
   image_path: "assets/branding/app_icon.png"
+
+# Configure sqlite3 native assets hook
+hooks:
+  user_defines:
+    sqlite3:
+      source: system
+      name_windows: winsqlite3.dll
 
 # The following section is specific to Flutter packages.
 flutter:

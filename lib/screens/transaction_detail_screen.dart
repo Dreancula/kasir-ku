@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import '../database/database_helper.dart';
 import '../models/transaction.dart';
 import '../config/app_config.dart';
+import '../widgets/animations.dart';
 
 class TransactionDetailScreen extends StatefulWidget {
   final TransactionModel transaction;
@@ -109,65 +110,69 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                     separatorBuilder: (_, i) => const SizedBox(height: 10),
                     itemBuilder: (context, index) {
                       final item = _items[index];
-                      return Container(
-                        padding: const EdgeInsets.all(14),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(14),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.04),
-                              blurRadius: 8,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        child: Row(
-                          children: [
-                            Container(
-                              width: 40,
-                              height: 40,
-                              decoration: BoxDecoration(
-                                color: AppConfig.primaryColor.withValues(alpha: 0.1),
-                                borderRadius: BorderRadius.circular(10),
+                      return FadeInUp(
+                        delayMs: index * 60,
+                        offset: 20,
+                        child: Container(
+                          padding: const EdgeInsets.all(14),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(14),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.04),
+                                blurRadius: 8,
+                                offset: const Offset(0, 2),
                               ),
-                              child: const Icon(
-                                Icons.fastfood,
-                                size: 20,
-                                color: AppConfig.primaryColor,
+                            ],
+                          ),
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 40,
+                                height: 40,
+                                decoration: BoxDecoration(
+                                  color: AppConfig.primaryColor.withValues(alpha: 0.1),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: const Icon(
+                                  Icons.fastfood,
+                                  size: 20,
+                                  color: AppConfig.primaryColor,
+                                ),
                               ),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    item['item_name'],
-                                    style: const TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w600,
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      item['item_name'],
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                      ),
                                     ),
-                                  ),
-                                  const SizedBox(height: 2),
-                                  Text(
-                                    '${item['quantity']} x ${currencyFormat.format(item['item_price'])}',
-                                    style: TextStyle(
-                                      fontSize: 13,
-                                      color: Colors.grey[500],
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      '${item['quantity']} x ${currencyFormat.format(item['item_price'])}',
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        color: Colors.grey[500],
+                                      ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
-                            ),
-                            Text(
-                              currencyFormat.format(item['subtotal']),
-                              style: const TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
+                              Text(
+                                currencyFormat.format(item['subtotal']),
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       );
                     },

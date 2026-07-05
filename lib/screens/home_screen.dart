@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import '../database/database_helper.dart';
 import '../models/menu_item.dart';
 import '../config/app_config.dart';
+import '../widgets/animations.dart';
 import 'add_menu_screen.dart';
 import 'package:provider/provider.dart';
 import '../providers/cart_provider.dart';
@@ -86,7 +87,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _openAddMenuForm() async {
     final result = await Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const AddMenuScreen()),
+      animatedPageRoute(const AddMenuScreen()),
     );
     if (result == true) {
       _loadMenu();
@@ -176,20 +177,14 @@ class _HomeScreenState extends State<HomeScreen> {
           IconButton(
             icon: const Icon(Icons.table_restaurant_outlined),
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const TablesScreen()),
-              );
+              Navigator.push(context, animatedPageRoute(const TablesScreen()));
             },
             tooltip: 'Manajemen Meja',
           ),
           IconButton(
             icon: const Icon(Icons.receipt_long_outlined),
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const HistoryScreen()),
-              );
+              Navigator.push(context, animatedPageRoute(const HistoryScreen()));
             },
             tooltip: 'Riwayat Transaksi',
           ),
@@ -203,9 +198,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(
-                          builder: (context) => const CartScreen(),
-                        ),
+                        animatedPageRoute(const CartScreen()),
                       );
                     },
                     tooltip: 'Keranjang',
@@ -403,7 +396,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 ? const Center(child: CircularProgressIndicator())
                 : _filteredItems.isEmpty
                     ? _buildEmptyState()
-                    : GridView.builder(
+                    : AnimatedStaggeredGrid(
+                        staggerDelay: 60,
                         padding: const EdgeInsets.all(16),
                         gridDelegate:
                             const SliverGridDelegateWithFixedCrossAxisCount(
@@ -413,9 +407,9 @@ class _HomeScreenState extends State<HomeScreen> {
                           mainAxisSpacing: 12,
                         ),
                         itemCount: _filteredItems.length,
-                        itemBuilder: (context, index) {
+                        itemBuilder: (context, index, animation) {
                           final item = _filteredItems[index];
-                          return _buildMenuCard(item);
+                          return _buildAnimatedMenuCard(item, animation);
                         },
                       ),
           ),
@@ -507,16 +501,14 @@ class _HomeScreenState extends State<HomeScreen> {
               padding: EdgeInsets.zero,
               children: [
                 const SizedBox(height: 8),
-                _buildDrawerItem(
+                  _buildDrawerItem(
                   icon: Icons.analytics_outlined,
                   title: 'Laporan Keuangan',
                   onTap: () {
                     Navigator.pop(context);
                     Navigator.push(
                       context,
-                      MaterialPageRoute(
-                        builder: (context) => const ReportsScreen(),
-                      ),
+                      animatedPageRoute(const ReportsScreen()),
                     );
                   },
                 ),
@@ -528,9 +520,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       Navigator.pop(context);
                       Navigator.push(
                         context,
-                        MaterialPageRoute(
-                          builder: (context) => const UsersScreen(),
-                        ),
+                        animatedPageRoute(const UsersScreen()),
                       );
                     },
                   ),
@@ -541,9 +531,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     Navigator.pop(context);
                     Navigator.push(
                       context,
-                      MaterialPageRoute(
-                        builder: (context) => const TablesScreen(),
-                      ),
+                      animatedPageRoute(const TablesScreen()),
                     );
                   },
                 ),
@@ -554,9 +542,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     Navigator.pop(context);
                     Navigator.push(
                       context,
-                      MaterialPageRoute(
-                        builder: (context) => const HistoryScreen(),
-                      ),
+                      animatedPageRoute(const HistoryScreen()),
                     );
                   },
                 ),
@@ -596,104 +582,115 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildMenuCard(MenuItem item) {
+  Widget _buildAnimatedMenuCard(MenuItem item, Animation<double> animation) {
     final categoryColor =
         _categoryColors[item.category.capitalize()] ?? AppConfig.primaryColor;
 
-    return GestureDetector(
-      onTap: () => _addToCart(item),
-      onLongPress: () async {
-        final result = await Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => AddMenuScreen(existingItem: item),
+    return AnimatedBuilder(
+      animation: animation,
+      builder: (context, child) {
+        return Opacity(
+          opacity: animation.value,
+          child: Transform.translate(
+            offset: Offset(0, 30 * (1 - animation.value)),
+            child: Transform.scale(
+              scale: 0.9 + (0.1 * animation.value),
+              child: child,
+            ),
           ),
         );
-        if (result == true) {
-          _loadMenu();
-        }
       },
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.06),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Icon area
-            Container(
-              height: 70,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: categoryColor.withValues(alpha: 0.12),
-                borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(16),
+      child: AnimatedPress(
+        onTap: () => _addToCart(item),
+        onLongPress: () async {
+          final result = await Navigator.push(
+            context,
+            animatedPageRoute(AddMenuScreen(existingItem: item)),
+          );
+          if (result == true) {
+            _loadMenu();
+          }
+        },
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.06),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                height: 70,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: categoryColor.withValues(alpha: 0.12),
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(16),
+                  ),
+                ),
+                child: Center(
+                  child: Icon(
+                    _categoryIcons[item.category.capitalize()] ??
+                        Icons.restaurant_menu,
+                    size: 36,
+                    color: categoryColor,
+                  ),
                 ),
               ),
-              child: Center(
-                child: Icon(
-                  _categoryIcons[item.category.capitalize()] ??
-                      Icons.restaurant_menu,
-                  size: 36,
-                  color: categoryColor,
-                ),
-              ),
-            ),
-            // Info area
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(12),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      item.name,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        item.name,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 4),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: categoryColor.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(
-                        item.category,
-                        style: TextStyle(
-                          fontSize: 11,
-                          color: categoryColor,
-                          fontWeight: FontWeight.w600,
+                      const SizedBox(height: 4),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: categoryColor.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          item.category,
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: categoryColor,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ),
-                    ),
-                    const Spacer(),
-                    Text(
-                      currencyFormat.format(item.price),
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: AppConfig.primaryColor,
+                      const Spacer(),
+                      Text(
+                        currencyFormat.format(item.price),
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: AppConfig.primaryColor,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -704,32 +701,38 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            _selectedCategory == 'Semua'
-                ? Icons.restaurant_menu
-                : _categoryIcons[_selectedCategory],
-            size: 72,
-            color: Colors.grey[300],
-          ),
-          const SizedBox(height: 16),
-          Text(
-            _selectedCategory == 'Semua'
-                ? 'Belum ada menu'
-                : 'Tidak ada menu $_selectedCategory',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              color: Colors.grey[600],
+          FadeInUp(
+            child: Icon(
+              _selectedCategory == 'Semua'
+                  ? Icons.restaurant_menu
+                  : _categoryIcons[_selectedCategory],
+              size: 72,
+              color: Colors.grey[300],
             ),
           ),
-          const SizedBox(height: 8),
-          Text(
-            _selectedCategory == 'Semua'
-                ? 'Tekan tombol + untuk menambah menu'
-                : 'Tambahkan menu $_selectedCategory terlebih dahulu',
-            style: TextStyle(
-              fontSize: 13,
-              color: Colors.grey[400],
+          FadeInUp(
+            delayMs: 150,
+            child: Text(
+              _selectedCategory == 'Semua'
+                  ? 'Belum ada menu'
+                  : 'Tidak ada menu $_selectedCategory',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: Colors.grey[600],
+              ),
+            ),
+          ),
+          FadeInUp(
+            delayMs: 300,
+            child: Text(
+              _selectedCategory == 'Semua'
+                  ? 'Tekan tombol + untuk menambah menu'
+                  : 'Tambahkan menu $_selectedCategory terlebih dahulu',
+              style: TextStyle(
+                fontSize: 13,
+                color: Colors.grey[400],
+              ),
             ),
           ),
         ],

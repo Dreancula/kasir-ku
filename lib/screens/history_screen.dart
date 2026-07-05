@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import '../database/database_helper.dart';
 import '../models/transaction.dart';
 import '../config/app_config.dart';
+import '../widgets/animations.dart';
 import 'transaction_detail_screen.dart';
 
 class HistoryScreen extends StatefulWidget {
@@ -151,7 +152,11 @@ class _HistoryScreenState extends State<HistoryScreen> {
                                 const SizedBox(height: 10),
                             itemBuilder: (context, index) {
                               final trx = _transactions[index];
-                              return _buildTransactionCard(trx);
+                              return FadeInUp(
+                                delayMs: index * 60,
+                                offset: 20,
+                                child: _buildTransactionCard(trx),
+                              );
                             },
                           ),
                   ),
@@ -166,9 +171,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(
-            builder: (context) => TransactionDetailScreen(transaction: trx),
-          ),
+          animatedPageRoute(TransactionDetailScreen(transaction: trx)),
         );
       },
       child: Container(
@@ -233,26 +236,34 @@ class _HistoryScreenState extends State<HistoryScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.receipt_long_outlined,
-            size: 72,
-            color: Colors.grey[300],
+          FadeInUp(
+            child: Icon(
+              Icons.receipt_long_outlined,
+              size: 72,
+              color: Colors.grey[300],
+            ),
           ),
           const SizedBox(height: 16),
-          Text(
-            'Belum ada transaksi',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              color: Colors.grey[600],
+          FadeInUp(
+            delayMs: 150,
+            child: Text(
+              'Belum ada transaksi',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: Colors.grey[600],
+              ),
             ),
           ),
           const SizedBox(height: 8),
-          Text(
-            'Transaksi akan muncul di sini',
-            style: TextStyle(
-              fontSize: 13,
-              color: Colors.grey[400],
+          FadeInUp(
+            delayMs: 300,
+            child: Text(
+              'Transaksi akan muncul di sini',
+              style: TextStyle(
+                fontSize: 13,
+                color: Colors.grey[400],
+              ),
             ),
           ),
         ],

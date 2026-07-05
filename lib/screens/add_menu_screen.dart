@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../database/database_helper.dart';
 import '../models/menu_item.dart';
 import '../config/app_config.dart';
+import '../widgets/animations.dart';
 
 class AddMenuScreen extends StatefulWidget {
   final MenuItem? existingItem; // null = mode tambah, ada isi = mode edit
@@ -144,49 +145,57 @@ class _AddMenuScreenState extends State<AddMenuScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               // Preview card
-              Container(
-                height: 140,
-                decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(16),
-                          boxShadow: [
-                            BoxShadow(
-                              color: color.withValues(alpha: 0.2),
-                              blurRadius: 12,
-                              offset: const Offset(0, 4),
+              ScaleIn(
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 300),
+                  height: 140,
+                  decoration: BoxDecoration(
+                    color: color.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        AnimatedContainer(
+                          duration: const Duration(milliseconds: 300),
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(16),
+                            boxShadow: [
+                              BoxShadow(
+                                color: color.withValues(alpha: 0.2),
+                                blurRadius: 12,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: AnimatedSwitcher(
+                            duration: const Duration(milliseconds: 300),
+                            child: Icon(
+                              _categoryIcons[_selectedCategory],
+                              key: ValueKey(_selectedCategory),
+                              size: 40,
+                              color: color,
                             ),
-                          ],
+                          ),
                         ),
-                        child: Icon(
-                          _categoryIcons[_selectedCategory],
-                          size: 40,
-                          color: color,
+                        const SizedBox(height: 10),
+                        Text(
+                          _nameController.text.isEmpty
+                              ? 'Nama Menu'
+                              : _nameController.text,
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: _nameController.text.isEmpty
+                                ? Colors.grey[400]
+                                : Colors.grey[800],
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 10),
-                      Text(
-                        _nameController.text.isEmpty
-                            ? 'Nama Menu'
-                            : _nameController.text,
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: _nameController.text.isEmpty
-                              ? Colors.grey[400]
-                              : Colors.grey[800],
-                        ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -194,140 +203,166 @@ class _AddMenuScreenState extends State<AddMenuScreen> {
               const SizedBox(height: 28),
 
               // Nama menu
-              const Text(
-                'Nama Menu',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: AppConfig.secondaryColor,
+              FadeInUp(
+                delayMs: 150,
+                child: const Text(
+                  'Nama Menu',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: AppConfig.secondaryColor,
+                  ),
                 ),
               ),
               const SizedBox(height: 8),
-              TextFormField(
-                controller: _nameController,
-                decoration: const InputDecoration(
-                  hintText: 'Contoh: Nasi Goreng Spesial',
-                  prefixIcon: Icon(Icons.restaurant_menu_outlined),
+              FadeInUp(
+                delayMs: 200,
+                child: TextFormField(
+                  controller: _nameController,
+                  decoration: const InputDecoration(
+                    hintText: 'Contoh: Nasi Goreng Spesial',
+                    prefixIcon: Icon(Icons.restaurant_menu_outlined),
+                  ),
+                  onChanged: (_) => setState(() {}),
+                  validator: (value) {
+                    if (value == null || value.trim().isEmpty) {
+                      return 'Nama menu wajib diisi';
+                    }
+                    return null;
+                  },
                 ),
-                onChanged: (_) => setState(() {}),
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return 'Nama menu wajib diisi';
-                  }
-                  return null;
-                },
               ),
 
               const SizedBox(height: 20),
 
               // Harga
-              const Text(
-                'Harga',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: AppConfig.secondaryColor,
+              FadeInUp(
+                delayMs: 250,
+                child: const Text(
+                  'Harga',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: AppConfig.secondaryColor,
+                  ),
                 ),
               ),
               const SizedBox(height: 8),
-              TextFormField(
-                controller: _priceController,
-                keyboardType: TextInputType.number,
-                decoration: const InputDecoration(
-                  hintText: 'Contoh: 25000',
-                  prefixIcon: Icon(Icons.attach_money_outlined),
-                  prefixText: 'Rp ',
+              FadeInUp(
+                delayMs: 300,
+                child: TextFormField(
+                  controller: _priceController,
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(
+                    hintText: 'Contoh: 25000',
+                    prefixIcon: Icon(Icons.attach_money_outlined),
+                    prefixText: 'Rp ',
+                  ),
+                  validator: (value) {
+                    if (value == null || value.trim().isEmpty) {
+                      return 'Harga wajib diisi';
+                    }
+                    if (double.tryParse(value) == null) {
+                      return 'Harga harus berupa angka';
+                    }
+                    if (double.parse(value) <= 0) {
+                      return 'Harga harus lebih dari 0';
+                    }
+                    return null;
+                  },
                 ),
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return 'Harga wajib diisi';
-                  }
-                  if (double.tryParse(value) == null) {
-                    return 'Harga harus berupa angka';
-                  }
-                  if (double.parse(value) <= 0) {
-                    return 'Harga harus lebih dari 0';
-                  }
-                  return null;
-                },
               ),
 
               const SizedBox(height: 20),
 
               // Kategori
-              const Text(
-                'Kategori',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: AppConfig.secondaryColor,
+              FadeInUp(
+                delayMs: 350,
+                child: const Text(
+                  'Kategori',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: AppConfig.secondaryColor,
+                  ),
                 ),
               ),
               const SizedBox(height: 8),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 4),
-                child: Row(
-                  children: _categories.map((cat) {
-                    final isSelected = _selectedCategory == cat;
-                    final catColor =
-                        _categoryColors[cat] ?? AppConfig.primaryColor;
+              FadeInUp(
+                delayMs: 400,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  child: Row(
+                    children: _categories.map((cat) {
+                      final isSelected = _selectedCategory == cat;
+                      final catColor =
+                          _categoryColors[cat] ?? AppConfig.primaryColor;
 
-                    return Expanded(
-                      child: GestureDetector(
-                        onTap: () => setState(() => _selectedCategory = cat),
-                        child: Container(
-                          margin: const EdgeInsets.symmetric(horizontal: 4),
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                          decoration: BoxDecoration(
-                            color: isSelected
-                                ? catColor
-                                : catColor.withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: isSelected ? catColor : Colors.transparent,
-                              width: 2,
+                      return Expanded(
+                        child: AnimatedPress(
+                          onTap: () => setState(() => _selectedCategory = cat),
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 250),
+                            margin: const EdgeInsets.symmetric(horizontal: 4),
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            decoration: BoxDecoration(
+                              color: isSelected
+                                  ? catColor
+                                  : catColor.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: isSelected ? catColor : Colors.transparent,
+                                width: 2,
+                              ),
+                            ),
+                            child: Column(
+                              children: [
+                                AnimatedSwitcher(
+                                  duration: const Duration(milliseconds: 250),
+                                  child: Icon(
+                                    _categoryIcons[cat],
+                                    key: ValueKey('$cat-$isSelected'),
+                                    size: 28,
+                                    color: isSelected ? Colors.white : catColor,
+                                  ),
+                                ),
+                                const SizedBox(height: 6),
+                                Text(
+                                  cat,
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                    color:
+                                        isSelected ? Colors.white : catColor,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                          child: Column(
-                            children: [
-                              Icon(
-                                _categoryIcons[cat],
-                                size: 28,
-                                color: isSelected ? Colors.white : catColor,
-                              ),
-                              const SizedBox(height: 6),
-                              Text(
-                                cat,
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w600,
-                                  color:
-                                      isSelected ? Colors.white : catColor,
-                                ),
-                              ),
-                            ],
-                          ),
                         ),
-                      ),
-                    );
-                  }).toList(),
+                      );
+                    }).toList(),
+                  ),
                 ),
               ),
 
               const SizedBox(height: 32),
 
               // Tombol simpan
-              ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                ),
-                onPressed: _saveMenu,
-                icon: Icon(_isEditMode ? Icons.save_outlined : Icons.add),
-                label: Text(
-                  _isEditMode ? 'Update Menu' : 'Simpan Menu',
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
+              FadeInUp(
+                delayMs: 500,
+                child: ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                  ),
+                  onPressed: _saveMenu,
+                  icon: Icon(_isEditMode ? Icons.save_outlined : Icons.add),
+                  label: Text(
+                    _isEditMode ? 'Update Menu' : 'Simpan Menu',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ),
@@ -335,17 +370,20 @@ class _AddMenuScreenState extends State<AddMenuScreen> {
               // Tombol hapus (mode edit)
               if (_isEditMode) ...[
                 const SizedBox(height: 12),
-                OutlinedButton.icon(
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: Colors.red,
-                    side: const BorderSide(color: Colors.red),
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                  ),
-                  onPressed: _confirmDelete,
-                  icon: const Icon(Icons.delete_outline),
-                  label: const Text(
-                    'Hapus Menu',
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                FadeInUp(
+                  delayMs: 550,
+                  child: OutlinedButton.icon(
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: Colors.red,
+                      side: const BorderSide(color: Colors.red),
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                    ),
+                    onPressed: _confirmDelete,
+                    icon: const Icon(Icons.delete_outline),
+                    label: const Text(
+                      'Hapus Menu',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
                   ),
                 ),
               ],

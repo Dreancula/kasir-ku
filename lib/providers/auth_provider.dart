@@ -41,7 +41,7 @@ class AuthProvider extends ChangeNotifier {
 
       _isInitialized = true;
     } catch (e) {
-      _error = 'Gagal inisialisasi: $e';
+      _error = e.toString();
     }
     notifyListeners();
   }

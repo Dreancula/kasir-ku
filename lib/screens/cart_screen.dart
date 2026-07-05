@@ -7,6 +7,7 @@ import '../providers/auth_provider.dart';
 import '../config/app_config.dart';
 import '../database/database_helper.dart';
 import '../services/receipt_pdf_service.dart';
+import '../widgets/animations.dart';
 
 class CartScreen extends StatelessWidget {
   const CartScreen({super.key});
@@ -67,111 +68,117 @@ class CartScreen extends StatelessWidget {
                   separatorBuilder: (_, i) => const SizedBox(height: 12),
                   itemBuilder: (context, index) {
                     final cartItem = cart.items[index];
-                    return Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.05),
-                            blurRadius: 8,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(14),
-                        child: Row(
-                          children: [
-                            // Icon
-                            Container(
-                              width: 48,
-                              height: 48,
-                              decoration: BoxDecoration(
-                                color:
-                                    AppConfig.primaryColor.withValues(alpha: 0.1),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: const Icon(
-                                Icons.fastfood,
-                                color: AppConfig.primaryColor,
-                              ),
+                    return FadeInUp(
+                      delayMs: index * 60,
+                      offset: 20,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.05),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
                             ),
-                            const SizedBox(width: 14),
-                            // Info
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    cartItem.menuItem.name,
-                                    style: const TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    currencyFormat
-                                        .format(cartItem.menuItem.price),
-                                    style: TextStyle(
-                                      fontSize: 13,
-                                      color: Colors.grey[600],
-                                    ),
-                                  ),
-                                ],
+                          ],
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(14),
+                          child: Row(
+                            children: [
+                              // Icon
+                              Container(
+                                width: 48,
+                                height: 48,
+                                decoration: BoxDecoration(
+                                  color: AppConfig.primaryColor
+                                      .withValues(alpha: 0.1),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: const Icon(
+                                  Icons.fastfood,
+                                  color: AppConfig.primaryColor,
+                                ),
                               ),
-                            ),
-                            // Quantity controls
-                            Container(
-                              decoration: BoxDecoration(
-                                color: Colors.grey[100],
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  IconButton(
-                                    icon: const Icon(Icons.remove,
-                                        size: 18, color: AppConfig.primaryColor),
-                                    onPressed: () =>
-                                        cart.decreaseItem(cartItem.menuItem),
-                                    padding: const EdgeInsets.all(8),
-                                    constraints: const BoxConstraints(),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 8),
-                                    child: Text(
-                                      '${cartItem.quantity}',
+                              const SizedBox(width: 14),
+                              // Info
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      cartItem.menuItem.name,
                                       style: const TextStyle(
                                         fontSize: 15,
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
-                                  ),
-                                  IconButton(
-                                    icon: const Icon(Icons.add,
-                                        size: 18, color: AppConfig.primaryColor),
-                                    onPressed: () =>
-                                        cart.addItem(cartItem.menuItem),
-                                    padding: const EdgeInsets.all(8),
-                                    constraints: const BoxConstraints(),
-                                  ),
-                                ],
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      currencyFormat
+                                          .format(cartItem.menuItem.price),
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        color: Colors.grey[600],
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-                            const SizedBox(width: 10),
-                            // Subtotal
-                            Text(
-                              currencyFormat.format(cartItem.subtotal),
-                              style: const TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.bold,
-                                color: AppConfig.primaryColor,
+                              // Quantity controls
+                              Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.grey[100],
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    IconButton(
+                                      icon: const Icon(Icons.remove,
+                                          size: 18,
+                                          color: AppConfig.primaryColor),
+                                      onPressed: () =>
+                                          cart.decreaseItem(cartItem.menuItem),
+                                      padding: const EdgeInsets.all(8),
+                                      constraints: const BoxConstraints(),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 8),
+                                      child: Text(
+                                        '${cartItem.quantity}',
+                                        style: const TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                    IconButton(
+                                      icon: const Icon(Icons.add,
+                                          size: 18,
+                                          color: AppConfig.primaryColor),
+                                      onPressed: () =>
+                                          cart.addItem(cartItem.menuItem),
+                                      padding: const EdgeInsets.all(8),
+                                      constraints: const BoxConstraints(),
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-                          ],
+                              const SizedBox(width: 10),
+                              // Subtotal
+                              Text(
+                                currencyFormat.format(cartItem.subtotal),
+                                style: const TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppConfig.primaryColor,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     );
@@ -277,26 +284,34 @@ class CartScreen extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.shopping_cart_outlined,
-            size: 80,
-            color: Colors.grey[300],
+          FadeInUp(
+            child: Icon(
+              Icons.shopping_cart_outlined,
+              size: 80,
+              color: Colors.grey[300],
+            ),
           ),
           const SizedBox(height: 20),
-          Text(
-            'Keranjang kosong',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: Colors.grey[600],
+          FadeInUp(
+            delayMs: 150,
+            child: Text(
+              'Keranjang kosong',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: Colors.grey[600],
+              ),
             ),
           ),
           const SizedBox(height: 8),
-          Text(
-            'Pilih menu untuk memulai pesanan',
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey[400],
+          FadeInUp(
+            delayMs: 300,
+            child: Text(
+              'Pilih menu untuk memulai pesanan',
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.grey[400],
+              ),
             ),
           ),
         ],
